@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario de Sistemas Operativos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        #start-section {
+            text-align: center;
+        }
+        #name-input {
+            padding: 10px;
+            width: 80%;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #quiz-section, #results-section {
+            display: none;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .option {
+            display: block;
+            margin: 5px 0;
+        }
+        #results-section p {
+            margin: 5px 0;
+        }
+        .correct {
+            color: green;
+        }
+        .incorrect {
+            color: red;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            #name-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cuestionario de Sistemas Operativos</h1>
+        <div id="start-section">
+            <label for="name-input">Ingrese su nombre:</label><br>
+            <input type="text" id="name-input" placeholder="Nombre del estudiante" required>
+            <button id="start-btn">Iniciar Cuestionario</button>
+        </div>
+        <div id="quiz-section">
+            <h2 id="student-name"></h2>
+            <form id="quiz-form">
+                <!-- Preguntas se insertarán aquí -->
+            </form>
+            <button id="submit-btn">Enviar Respuestas</button>
+        </div>
+        <div id="results-section">
+            <h2>Resultados</h2>
+            <p id="score"></p>
+            <!-- Resultados detallados se insertarán aquí -->
+        </div>
+    </div>
+
+    <script>
+        const questionBank = [
+            { question: "¿Qué es un sistema operativo?", options: ["A) Software que gestiona hardware y software", "B) Un tipo de hardware", "C) Un lenguaje de programación", "D) Una red"], correct: "A" },
+            { question: "¿Cuál es el kernel de Linux?", options: ["A) El núcleo del SO", "B) Una interfaz gráfica", "C) Un editor de texto", "D) Un navegador"], correct: "A" },
+            { question: "¿Qué comando en Linux lista archivos?", options: ["A) ls", "B) dir", "C) list", "D) show"], correct: "A" },
+            { question: "¿En Windows, qué es el Explorador de Archivos?", options: ["A) Gestor de archivos", "B) Navegador web", "C) Editor de texto", "D) Antivirus"], correct: "A" },
+            { question: "¿macOS se basa en qué sistema?", options: ["A) Unix", "B) Windows NT", "C) DOS", "D) Android"], correct: "A" },
+            { question: "¿Qué es el Registro en Windows?", options: ["A) Base de datos de configuración", "B) Carpeta de documentos", "C) Programa de instalación", "D) Firewall"], correct: "A" },
+            { question: "¿Comando para cambiar directorio en Linux?", options: ["A) cd", "B) chdir", "C) dir", "D) move"], correct: "A" },
+            { question: "¿Qué es Time Machine en macOS?", options: ["A) Herramienta de respaldo", "B) Reloj", "C) Editor de video", "D) Navegador"], correct: "A" },
+            { question: "¿En Windows, qué extensión tienen los ejecutables?", options: ["A) .exe", "B) .sh", "C) .app", "D) .bin"], correct: "A" },
+            { question: "¿Qué es sudo en Linux?", options: ["A) Comando para privilegios elevados", "B) Usuario predeterminado", "C) Editor", "D) Compilador"], correct: "A" },
+            { question: "¿Qué es el Dock en macOS?", options: ["A) Barra de aplicaciones", "B) Gestor de ventanas", "C) Firewall", "D) Terminal"], correct: "A" },
+            { question: "¿Comando para apagar en Linux?", options: ["A) shutdown", "B) exit", "C) close", "D) poweroff"], correct: "A" },
+            { question: "¿En Windows, qué es el Panel de Control?", options: ["A) Configuraciones del sistema", "B) Juego", "C) Editor", "D) Reproductor"], correct: "A" },
+            { question: "¿Qué es apt en Linux?", options: ["A) Gestor de paquetes", "B) Comando de red", "C) Editor", "D) Visor"], correct: "A" },
+            { question: "¿macOS usa qué sistema de archivos por defecto?", options: ["A) APFS", "B) NTFS", "C) ext4", "D) FAT32"], correct: "A" },
+            { question: "¿Qué es el Administrador de Tareas en Windows?", options: ["A) Monitorea procesos", "B) Edita texto", "C) Navega web", "D) Instala software"], correct: "A" },
+            { question: "¿Comando para ver procesos en Linux?", options: ["A) ps", "B) task", "C) proc", "D) listp"], correct: "A" },
+            { question: "¿Qué es Spotlight en macOS?", options: ["A) Buscador", "B) Luz", "C) Editor", "D) Antivirus"], correct: "A" },
+            { question: "¿En Windows, qué es CMD?", options: ["A) Línea de comandos", "B) Editor gráfico", "C) Navegador", "D) Juego"], correct: "A" },
+            { question: "¿Qué es chmod en Linux?", options: ["A) Cambia permisos", "B) Cambia modo", "C) Compila", "D) Copia"], correct: "A" },
+            { question: "¿Qué es Mission Control en macOS?", options: ["A) Gestor de ventanas", "B) Misión espacial", "C) Editor", "D) Red"], correct: "A" },
+            { question: "¿Comando para copiar archivos en Linux?", options: ["A) cp", "B) copy", "C) mv", "D) dup"], correct: "A" },
+            { question: "¿En Windows, qué es PowerShell?", options: ["A) Shell avanzada", "B) Fuente de poder", "C) Juego", "D) Antivirus"], correct: "A" },
+            { question: "¿Qué es grep en Linux?", options: ["A) Busca texto", "B) Grupo", "C) Editor", "D) Compresor"], correct: "A" },
+            { question: "¿macOS es desarrollado por?", options: ["A) Apple", "B) Microsoft", "C) Google", "D) Linux Foundation"], correct: "A" },
+            { question: "¿Qué es el Firewall en Windows?", options: ["A) Protección de red", "B) Muro de fuego", "C) Editor", "D) Reproductor"], correct: "A" },
+            { question: "¿Comando para remover archivos en Linux?", options: ["A) rm", "B) del", "C) remove", "D) erase"], correct: "A" },
+            { question: "¿Qué es Finder en macOS?", options: ["A) Gestor de archivos", "B) Buscador", "C) Editor", "D) Navegador"], correct: "A" },
+            { question: "¿En Windows, qué es el Modo Seguro?", options: ["A) Inicio mínimo", "B) Modo juego", "C) Modo completo", "D) Modo red"], correct: "A" },
+            { question: "¿Qué es tar en Linux?", options: ["A) Compresor de archivos", "B) Tarjeta", "C) Editor", "D) Visor"], correct: "A" },
+            { question: "¿Qué es Siri en macOS?", options: ["A) Asistente virtual", "B) Juego", "C) Editor", "D) Antivirus"], correct: "A" },
+            { question: "¿Comando para ver IP en Linux?", options: ["A) ifconfig", "B) ipconfig", "C) netstat", "D) ping"], correct: "A" },
+            { question: "¿En Windows, qué es el Disco Local C:?", options: ["A) Unidad principal", "B) Disco externo", "C) CD", "D) Red"], correct: "A" },
+            { question: "¿Qué es nano en Linux?", options: ["A) Editor de texto", "B) Nano tecnología", "C) Compilador", "D) Visor"], correct: "A" },
+            { question: "¿Qué es Gatekeeper en macOS?", options: ["A) Seguridad de apps", "B) Portero", "C) Editor", "D) Reproductor"], correct: "A" },
+            { question: "¿Comando para crear directorio en Linux?", options: ["A) mkdir", "B) md", "C) createdir", "D) newdir"], correct: "A" },
+            { question: "¿En Windows, qué es el Centro de Acción?", options: ["A) Notificaciones", "B) Centro de juegos", "C) Editor", "D) Antivirus"], correct: "A" },
+            { question: "¿Qué es ping en Linux?", options: ["A) Prueba de conexión", "B) Juego", "C) Editor", "D) Compresor"], correct: "A" },
+            { question: "¿macOS Ventura es qué versión?", options: ["A) 13", "B) 10", "C) 11", "D) 12"], correct: "A" },
+            { question: "¿Qué es el Visor de Eventos en Windows?", options: ["A) Registros del sistema", "B) Visor de imágenes", "C) Editor", "D) Navegador"], correct: "A" },
+            { question: "¿Comando para actualizar paquetes en Linux (Debian)?", options: ["A) apt update", "B) yum update", "C) dnf update", "D) pacman -Syu"], correct: "A" },
+            { question: "¿Qué es iCloud en macOS?", options: ["A) Almacenamiento en nube", "B) Icono", "C) Editor", "D) Juego"], correct: "A" },
+            { question: "¿En Windows, qué es el Símbolo del Sistema?", options: ["A) CMD", "B) PowerShell", "C) Terminal", "D) Bash"], correct: "A" },
+            { question: "¿Qué es df en Linux?", options: ["A) Espacio en disco", "B) Definir", "C) Editor", "D) Visor"], correct: "A" },
+            { question: "¿Qué es Continuity en macOS?", options: ["A) Integración con dispositivos Apple", "B) Continuidad", "C) Editor", "D) Antivirus"], correct: "A" },
+            { question: "¿Comando para matar proceso en Linux?", options: ["A) kill", "B) end", "C) stop", "D) terminate"], correct: "A" },
+            { question: "¿En Windows, qué es OneDrive?", options: ["A) Almacenamiento en nube", "B) Unidad única", "C) Editor", "D) Juego"], correct: "A" },
+            { question: "¿Qué es uname en Linux?", options: ["A) Información del sistema", "B) Nombre de usuario", "C) Editor", "D) Compresor"], correct: "A" },
+            { question: "¿Qué es App Store en macOS?", options: ["A) Tienda de aplicaciones", "B) Almacén de apps", "C) Editor", "D) Navegador"], correct: "A" },
+            { question: "¿Comando para ver historial en Linux?", options: ["A) history", "B) log", "C) hist", "D) past"], correct: "A" },
+            { question: "¿En Windows, qué es el Modo Dios?", options: ["A) Acceso avanzado", "B) Modo divino", "C) Juego", "D) Antivirus"], correct: "A" },
+            { question: "¿Qué es awk en Linux?", options: ["A) Procesador de texto", "B) Awkward", "C) Editor", "D) Visor"], correct: "A" },
+            { question: "¿Qué es Handoff en macOS?", options: ["A) Transferencia entre dispositivos", "B) Mano", "C) Editor", "D) Red"], correct: "A" }
+        ]; // Banco de 52 preguntas
+
+        const startSection = document.getElementById('start-section');
+        const quizSection = document.getElementById('quiz-section');
+        const resultsSection = document.getElementById('results-section');
+        const startBtn = document.getElementById('start-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const studentName = document.getElementById('student-name');
+        const nameInput = document.getElementById('name-input');
+        const quizForm = document.getElementById('quiz-form');
+        const scorePara = document.getElementById('score');
+        const resultsDetails = resultsSection; // Usaremos el div para agregar detalles
+
+        let selectedQuestions = [];
+        let userAnswers = {};
+
+        startBtn.addEventListener('click', () => {
+            const name = nameInput.value.trim();
+            if (name) {
+                studentName.textContent = `Cuestionario para: ${name}`;
+                startSection.style.display = 'none';
+                quizSection.style.display = 'block';
+                loadQuiz();
+            } else {
+                alert('Por favor, ingrese su nombre.');
+            }
+        });
+
+        function loadQuiz() {
+            // Seleccionar 10 preguntas aleatorias
+            selectedQuestions = questionBank.sort(() => 0.5 - Math.random()).slice(0, 10);
+            quizForm.innerHTML = '';
+            selectedQuestions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+                questionDiv.innerHTML = `<p>${index + 1}. ${q.question}</p>`;
+                q.options.forEach(opt => {
+                    const label = document.createElement('label');
+                    label.classList.add('option');
+                    label.innerHTML = `<input type="radio" name="q${index}" value="${opt.charAt(0)}"> ${opt}`;
+                    questionDiv.appendChild(label);
+                });
+                quizForm.appendChild(questionDiv);
+            });
+        }
+
+        submitBtn.addEventListener('click', () => {
+            let score = 0;
+            const formData = new FormData(quizForm);
+            selectedQuestions.forEach((q, index) => {
+                const answer = formData.get(`q${index}`);
+                userAnswers[index] = answer;
+                if (answer === q.correct) score++;
+            });
+            quizSection.style.display = 'none';
+            resultsSection.style.display = 'block';
+            scorePara.textContent = `Puntuación: ${score}/10`;
+            showResults();
+        });
+
+        function showResults() {
+            selectedQuestions.forEach((q, index) => {
+                const resultP = document.createElement('p');
+                resultP.innerHTML = `${index + 1}. ${q.question} - Tu respuesta: ${userAnswers[index] || 'Ninguna'}`;
+                if (userAnswers[index] === q.correct) {
+                    resultP.classList.add('correct');
+                    resultP.innerHTML += ' (Correcta)';
+                } else {
+                    resultP.classList.add('incorrect');
+                    resultP.innerHTML += ` (Incorrecta - Correcta: ${q.correct})`;
+                }
+                resultsDetails.appendChild(resultP);
+            });
+        }
+    </script>
+</body>
+</html>
